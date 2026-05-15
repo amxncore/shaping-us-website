@@ -2,31 +2,25 @@ import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Link } from "react-router-dom";
 import SpeakerCard from "./SpeakerCard";
-import speaker1 from "@/assets/images/image.jpg";
-import speaker2 from "@/assets/images/trump.png";
-import speaker3 from "@/assets/images/ronnie.webp";
 
 const speakers = [
   {
-    name: "Kim Jong Un",
-    role: "Supreme Leader",
-    talkTitle: "The Architecture of Power",
-    bio: "Looking at things. Pointing at things. Sometimes pushing the big red button (metaphorically... we hope).",
-    imageUrl: speaker1,
+    name: "Speaker TBA",
+    role: "Coming Soon",
+    talkTitle: "To Be Announced",
+    bio: "Our speaker lineup is being carefully curated. Stay tuned for exciting announcements.",
   },
   {
-    name: "Donald Trump",
-    role: "45th U.S. President",
-    talkTitle: "The Art of the Deal",
-    bio: "This talk is going to be tremendous. The best talk. Everyone says it. Bigly.",
-    imageUrl: speaker2,
+    name: "Speaker TBA",
+    role: "Coming Soon",
+    talkTitle: "To Be Announced",
+    bio: "Our speaker lineup is being carefully curated. Stay tuned for exciting announcements.",
   },
   {
-    name: "Ronnie Coleman",
-    role: "8x Mr. Olympia",
-    talkTitle: "YEAH BUDDY!",
-    bio: "Light weight baby! Nothin' but a peanut!",
-    imageUrl: speaker3,
+    name: "Speaker TBA",
+    role: "Coming Soon",
+    talkTitle: "To Be Announced",
+    bio: "Our speaker lineup is being carefully curated. Stay tuned for exciting announcements.",
   },
 ];
 
@@ -35,11 +29,15 @@ const SpeakersSection = () => {
   const inView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section ref={ref} className="py-24">
+    <section ref={ref} className="py-24 relative">
+      {/* Ambient underglow */}
+      <div className="section-underglow" />
+
       <div className="container mx-auto px-6">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
@@ -50,15 +48,16 @@ const SpeakersSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 group/list">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 perspective-800">
           {speakers.map((speaker, i) => (
-            <SpeakerCard key={speaker.name} {...speaker} index={i} />
+            <SpeakerCard key={`speaker-${i}`} {...speaker} index={i} isTBA={true} />
           ))}
         </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.5 }}
           className="text-center mt-12"
         >

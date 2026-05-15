@@ -1,101 +1,181 @@
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useState, useMemo } from "react";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import FloatingShapes from "./FloatingShapes";
-import logo from "@/assets/logo.png";
+import FluidBackground from "./FluidBackground";
+import MagneticButton from "./MagneticButton";
+
+// Cinematic easing
+const cineEase = [0.22, 1, 0.36, 1] as const;
 
 const HeroSection = () => {
-  const { scrollY } = useScroll();
-  const yBg = useTransform(scrollY, [0, 1000], [0, 300]);
-  const yText = useTransform(scrollY, [0, 1000], [0, 100]);
+
+  // Pre-compute subtle random offsets for TEDxICEAS letters
+  const tedxOffsets = useMemo(() => {
+    return "TEDxICEAS".split("").map(() => ({
+      x: (Math.random() - 0.5) * 120,
+      y: (Math.random() - 0.5) * 80,
+      rotate: (Math.random() - 0.5) * 30,
+    }));
+  }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <motion.div style={{ y: yBg, willChange: "transform" }} className="absolute inset-0 z-0">
-        <FloatingShapes />
-      </motion.div>
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-transparent">
+      {/* Fluid Background */}
+      <FluidBackground />
 
-      {/* Pulsing radial glow behind hero - Restored */}
-      <motion.div style={{ y: yBg }} className="absolute inset-0 pointer-events-none z-0 flex items-center justify-center">
-        <motion.div
-          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="w-[600px] md:w-[800px] h-[600px] md:h-[800px] rounded-full bg-primary/10 blur-[100px] md:blur-[140px]"
-        />
-      </motion.div>
+      {/* Content */}
+      <div className="container mx-auto px-6 relative z-10 text-center">
 
-      <motion.div className="container mx-auto px-6 relative z-10 text-center" style={{ y: yText, willChange: "transform" }}>
+        {/* IDEAS WORTH SPREADING — smooth letter fade with vertical reveal */}
+        <div className="mb-8 overflow-hidden">
+          <motion.p
+            className="text-foreground/50 text-xs sm:text-sm tracking-[0.35em] uppercase font-body font-medium"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 1.2, ease: cineEase }}
+          >
+            {"IDEAS WORTH SPREADING".split("").map((char, i) => (
+              <motion.span
+                key={i}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  delay: 0.8 + i * 0.035,
+                  duration: 0.6,
+                  ease: cineEase,
+                }}
+              >
+                {char === " " ? "\u00A0" : char}
+              </motion.span>
+            ))}
+          </motion.p>
+        </div>
+
+        {/* TEDxICEAS — cinematic letter assembly */}
+        <div className="flex justify-center mb-4">
+          <h1 className="font-display font-black text-5xl sm:text-7xl lg:text-8xl xl:text-[9rem] tracking-tight relative leading-none">
+            {"TEDxICEAS".split("").map((char, i) => (
+              <motion.span
+                key={i}
+                className="inline-block"
+                initial={{
+                  opacity: 0,
+                  x: tedxOffsets[i].x,
+                  y: tedxOffsets[i].y,
+                  rotate: tedxOffsets[i].rotate,
+                  filter: "blur(12px)",
+                  scale: 0.5,
+                }}
+                animate={{
+                  opacity: 1,
+                  x: 0,
+                  y: 0,
+                  rotate: 0,
+                  filter: "blur(0px)",
+                  scale: 1,
+                }}
+                transition={{
+                  delay: 1.8 + i * 0.06,
+                  duration: 1.2,
+                  ease: [0.16, 1, 0.3, 1], // very smooth out
+                }}
+                className={i >= 4 ? "text-[#E62B1E]" : "text-foreground"}
+              >
+                {char}
+              </motion.span>
+            ))}
+
+            {/* Subtle red pulse glow after letters assemble */}
+            <motion.div
+              className="absolute inset-[-20px] pointer-events-none rounded-2xl"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 0.15, 0], scale: [0.98, 1.02, 1] }}
+              transition={{
+                delay: 2.8,
+                duration: 1.2,
+                ease: "easeInOut",
+              }}
+              style={{
+                background: "radial-gradient(ellipse at center, rgba(230,43,30,0.3) 0%, transparent 70%)",
+              }}
+            />
+          </h1>
+        </div>
+
+        {/* What Shapes Us — elegant fade-up with stagger */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 3.0, duration: 0.8 }}
         >
-          <p className="text-muted-foreground text-sm tracking-[0.3em] uppercase mb-6 font-body">
-            Ideas Worth Spreading
-          </p>
+          <motion.p
+            className="font-display text-xl sm:text-2xl lg:text-3xl text-foreground/70 font-light tracking-wide"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              delay: 3.0,
+              duration: 1.4,
+              ease: cineEase,
+            }}
+          >
+            {"What Shapes Us".split(" ").map((word, wi) => (
+              <motion.span
+                key={wi}
+                className="inline-block mr-[0.3em]"
+                initial={{ opacity: 0, y: 25 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  delay: 3.0 + wi * 0.15,
+                  duration: 1.0,
+                  ease: cineEase,
+                }}
+              >
+                {word}
+              </motion.span>
+            ))}
+          </motion.p>
         </motion.div>
 
+        {/* Buttons — smooth delayed fade up */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
-          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-          transition={{ duration: 1.2, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          className="flex justify-center"
-        >
-          <img
-            src={logo}
-            alt="TEDxICEAS"
-            className="h-24 sm:h-32 lg:h-40 xl:h-48 w-auto object-contain drop-shadow-2xl"
-          />
-        </motion.div>
-
-        <motion.p
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="font-display text-xl sm:text-2xl lg:text-3xl text-muted-foreground mt-6 font-light"
+          transition={{ delay: 3.8, duration: 1.0, ease: cineEase }}
+          className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          What Shapes Us
-        </motion.p>
-
-
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4"
-        >
-          <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+          <MagneticButton radius={50}>
             <Link
               to="/register"
-              className="bg-primary text-primary-foreground px-8 py-3.5 rounded-full font-semibold text-sm hover:bg-primary/90 transition-shadow hover:shadow-[0_0_20px_rgba(235,0,40,0.3)] inline-block"
+              className="bg-primary text-white px-8 py-3.5 rounded-full font-semibold text-sm hover:bg-primary/90 transition-all duration-300 hover:shadow-[0_0_30px_rgba(230,43,30,0.25)] inline-block"
             >
               Register Now
             </Link>
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.05 }} transition={{ type: "spring", stiffness: 400, damping: 25 }}>
+          </MagneticButton>
+          <MagneticButton radius={50}>
             <Link
               to="/speakers"
-              className="border border-border text-foreground px-8 py-3.5 rounded-full font-semibold text-sm hover:bg-secondary/50 transition-colors inline-block"
+              className="border border-foreground/15 text-foreground/80 px-8 py-3.5 rounded-full font-semibold text-sm hover:bg-foreground/5 hover:border-foreground/25 transition-all duration-300 inline-block"
             >
               View Speakers
             </Link>
-          </motion.div>
+          </MagneticButton>
         </motion.div>
-      </motion.div>
+      </div>
 
-      {/* Scroll indicator */}
+      {/* Scroll indicator — appears last */}
       <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
+        animate={{ opacity: 0.5 }}
+        transition={{ delay: 4.5, duration: 1.5 }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2"
       >
         <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="w-5 h-8 border border-muted-foreground/30 rounded-full flex items-start justify-center p-1.5"
+          animate={{ y: [0, 6, 0] }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          className="w-5 h-8 border border-foreground/20 rounded-full flex items-start justify-center p-1.5"
         >
-          <div className="w-1 h-1.5 bg-muted-foreground/50 rounded-full" />
+          <div className="w-1 h-1.5 bg-foreground/40 rounded-full" />
         </motion.div>
       </motion.div>
     </section>
